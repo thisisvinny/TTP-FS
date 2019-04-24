@@ -26,12 +26,14 @@ def register():
 				if email_exists:
 					flash("An account with that email already exists.")
 					return redirect(url_for("register"))
-				cur.execute("insert into users (name, email, password) values (?,?,?)", (name, email, generate_password_hash(password)))
+				cur.execute("insert into users (name, email, password, balance) values (?,?,?, 5000.00)", (name, email, generate_password_hash(password)))
 				con.commit()
+				id_num = cur.execute("select id from users where email=?", (email, )).fetchone()[0]
 		except:
 			con.rollback()
 		finally:
 			con.close()
+		session["id"] = id_num
 		session["name"] = name
 		session["email"] = email
 		return redirect(url_for("home"))
@@ -54,7 +56,9 @@ def login():
 					#verify email and password are correct
 					hashed_password = cur.execute("select password from users where email=?", (email, )).fetchone()[0]
 					if check_password_hash(hashed_password, password):
-						session["name"] = cur.execute("select name from users where email=?", (email, )).fetchone()[0]
+						id_num, name = cur.execute("select id, name from users where email=?", (email, )).fetchone()
+						session["id"] = id_num
+						session["name"] = name
 						session["email"] = email
 						return redirect(url_for("home"))
 				flash("Incorrect username or password.")
@@ -68,15 +72,25 @@ def login():
 @app.route("/logout/")
 def logout():
 	if "email" in session:
+		session.pop("id", None)
 		session.pop("name", None)
 		session.pop("email", None)
 	return redirect(url_for("home"))
 
-@app.route("/portfolio/")
+@app.route("/portfolio/", methods=["GET", "POST"])
 def portfolio():
 	if "email" not in session:
 		return redirect(url_for("home"))
-	return render_template("portfolio.html")
+
+	#Post method, buy stocks
+	if request.method == "POST":
+		return redirect(url_for("portfolio"))
+	#Get method, display page with the user's stock portfolio and cash
+	with sqlite3.connect("database.db") as con:
+		cur = con.cursor()
+		cash = "%.2f" % cur.execute("select balance from users where id=?", (session["id"], )).fetchone()[0]
+	con.close()
+	return render_template("portfolio.html", cash=cash)
 
 @app.route("/transactions/")
 def transactions():

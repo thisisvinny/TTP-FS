@@ -12,7 +12,7 @@
 <section class="section">
 	<div class="columns">
 
-		<div class="column is-6 is-offset-1">
+		<div class="column is-5 is-offset-1">
 			<section class="section">
 				<div class="container">
 					<h1 class="title has-text-black">Portfolio</h1>
@@ -32,8 +32,36 @@
 
 		<div class="column is-5">
 			<section class="section">
-				<div class="container">
-					<h1 class="title has-text-black">Portfolio</h1>
+				<div class="container is-fluid">
+					<h1 class="title has-text-black">Cash: ${{ cash }}</h1>
+
+					<form name="buy" method="POST" action="/portfolio/">
+						{% with messages = get_flashed_messages() %}
+							{% if messages %}
+								<div class="has-text-centered">
+									{% for message in messages %}
+										<h2 class="title is-4">{{ message }}</p>
+									{% endfor %}
+								</div>
+								<br></br>
+							{% endif %}
+						{% endwith %}
+						<div class="field">
+							<div class="control">
+								<input class="input is-rounded" type="text" placeholder="Ticker Symbol" name="ticker_symbol">
+							</div>
+						</div>
+						<div class="field">
+							<div class="control">
+								<input class="input is-rounded" type="number" placeholder="Quantity" name="quantity">
+							</div>
+						</div>
+						<div class="field">
+							<div class="control">
+								<input class="button is-light is-rounded" type="submit" value="Buy">
+							</div>
+						</div>
+					</form>
 				</div>
 			</section>
 		</div>
