@@ -38,16 +38,3 @@ def login():
 		print(request.form)
 		return render_template("login.html")
 	return render_template("login.html")
-
-def createUser(name, email, password):
-	#Make sure the entered email is unique
-	with open("users.csv", "r", newline="") as csvfile:
-		reader = csv.DictReader(csvfile)
-		for row in reader:
-			if row["email"] == email:
-				print("Email has already been registered")
-	#Create user with the given information
-	with open("users.csv", "a", newline="") as csvfile:
-		fieldnames = ["name", "email", "password"]
-		writer = csv.DictWriter(csvfile, fieldnames)
-		writer.writerow({"name": name, "email": email, "password": password})
