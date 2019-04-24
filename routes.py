@@ -11,6 +11,9 @@ def home():
 
 @app.route("/register/", methods=["GET", "POST"])
 def register():
+	if "email" in session:
+		return redirect(url_for("home"))
+
 	if request.method == "POST":
 		try:
 			name = request.form["name"]
@@ -29,11 +32,16 @@ def register():
 			con.rollback()
 		finally:
 			con.close()
+		session["name"] = name
+		session["email"] = email
 		return redirect(url_for("home"))
 	return render_template("register.html")
 
 @app.route("/login/", methods=["GET", "POST"])
 def login():
+	if "email" in session:
+		return redirect(url_for("home"))
+
 	if request.method == "POST":
 		try:
 			email = request.form["email"]
@@ -46,6 +54,8 @@ def login():
 					#verify email and password are correct
 					hashed_password = cur.execute("select password from users where email=?", (email, )).fetchone()[0]
 					if check_password_hash(hashed_password, password):
+						session["name"] = cur.execute("select name from users where email=?", (email, )).fetchone()[0]
+						session["email"] = email
 						return redirect(url_for("home"))
 				flash("Incorrect username or password.")
 				return redirect(url_for("login"))
@@ -54,3 +64,10 @@ def login():
 		finally:
 			con.close()
 	return render_template("login.html")
+
+@app.route("/logout/")
+def logout():
+	if "email" in session:
+		session.pop("name")
+		session.pop("email")
+	return redirect(url_for("home"))

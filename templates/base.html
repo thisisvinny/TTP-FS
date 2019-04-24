@@ -26,12 +26,24 @@
 
 			<div class="navbar-end">
 				<div class="navbar-item">
-					<a class="navbar-item" href="{{ url_for('register') }}">
-						Register
-					</a>
-					<a class="navbar-item" href="{{ url_for('login') }}">
-						Log in
-					</a>
+					{% if not session["email"] %}
+						<a class="navbar-item" href="{{ url_for('register') }}">
+							Register
+						</a>
+						<a class="navbar-item" href="{{ url_for('login') }}">
+							Log in
+						</a>
+					{% else %}
+						<a class="navbar-item">
+							Portfolio
+						</a>
+						<a class="navbar-item">
+							Transactions
+						</a>
+						<a class="navbar-item" href="{{ url_for('logout') }}">
+							Logout
+						</a>
+					{% endif %}
 				</div>
 			</div>
 		</div>
