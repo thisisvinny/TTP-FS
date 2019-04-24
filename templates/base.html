@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Home</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+</head>
+
+<body>
+	<nav class="navbar is-light" role="navigation" aria-label="main navigation">
+		<div class="navbar-menu">
+			<div class="navbar-start">
+				<div class="navbar-item">
+					<a class="navbar-item" href="/">
+						Home
+					</a>
+					<a class="navbar-item">
+						Documentation
+					</a>
+				</div>
+			</div>
+
+			<div class="navbar-end">
+				<div class="navbar-item">
+					<a class="navbar-item" href="/register/">
+						Register
+					</a>
+					<a class="navbar-item" href="/login/">
+						Log in
+					</a>
+				</div>
+			</div>
+		</div>
+	</nav>
+</body>
+
+{% block content %}
+{% endblock %}
+</html>
