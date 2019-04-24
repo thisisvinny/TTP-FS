@@ -68,6 +68,6 @@ def login():
 @app.route("/logout/")
 def logout():
 	if "email" in session:
-		session.pop("name")
-		session.pop("email")
+		session.pop("name", None)
+		session.pop("email", None)
 	return redirect(url_for("home"))
