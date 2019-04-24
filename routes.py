@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, session, url_for, redirect, flash
 from werkzeug import generate_password_hash, check_password_hash
-import csv
+import sqlite3
 
 app = Flask(__name__)
 app.secret_key = "TTP-FS"
@@ -23,7 +23,7 @@ def register():
 				if(email_exists):
 					flash("An account with that email already exists.")
 					return redirect(url_for("register"))
-				cur.execute("insert into users (name, email, password) values (?,?,?)", (name, email, password))
+				cur.execute("insert into users (name, email, password) values (?,?,?)", (name, email, generate_password_hash(password)))
 				con.commit()
 		except:
 			con.rollback()
@@ -38,3 +38,16 @@ def login():
 		print(request.form)
 		return render_template("login.html")
 	return render_template("login.html")
+
+def createUser(name, email, password):
+	#Make sure the entered email is unique
+	with open("users.csv", "r", newline="") as csvfile:
+		reader = csv.DictReader(csvfile)
+		for row in reader:
+			if row["email"] == email:
+				print("Email has already been registered")
+	#Create user with the given information
+	with open("users.csv", "a", newline="") as csvfile:
+		fieldnames = ["name", "email", "password"]
+		writer = csv.DictWriter(csvfile, fieldnames)
+		writer.writerow({"name": name, "email": email, "password": password})
