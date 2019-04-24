@@ -71,3 +71,15 @@ def logout():
 		session.pop("name", None)
 		session.pop("email", None)
 	return redirect(url_for("home"))
+
+@app.route("/portfolio/")
+def portfolio():
+	if "email" not in session:
+		return redirect(url_for("home"))
+	return render_template("portfolio.html")
+
+@app.route("/transactions/")
+def transactions():
+	if "email" not in session:
+		return redirect(url_for("home"))
+	return render_template("transactions.html")

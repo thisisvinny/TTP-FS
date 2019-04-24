@@ -34,10 +34,10 @@
 							Log in
 						</a>
 					{% else %}
-						<a class="navbar-item">
+						<a class="navbar-item" href="{{ url_for('portfolio') }}">
 							Portfolio
 						</a>
-						<a class="navbar-item">
+						<a class="navbar-item" href="{{ url_for('transactions') }}">
 							Transactions
 						</a>
 						<a class="navbar-item" href="{{ url_for('logout') }}">
