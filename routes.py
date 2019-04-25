@@ -133,15 +133,9 @@ def portfolio():
 			#else insert new stock
 			except:
 				cur.execute("insert into portfolio (id, ticker_symbol, quantity) values (?,?,?)", (session["id"], ticker_symbol, quantity))
-			'''if old_quantity:
-				cur.execute("update portfolio set quantity=? where id=? and ticker_symbol=?", (old_quantity+quantity, session["id"], ticker_symbol))
-			#else insert new stock 
-			else:
-				cur.execute("insert into portfolio (id, ticker_symbol, quantity) values (?,?,?)", (session["id"], ticker_symbol, quantity))
-				'''
 		con.close()
 		return redirect(url_for("portfolio"))
-		
+
 	#Get method, display page with the user's stock portfolio and cash
 	with sqlite3.connect("database.db") as con:
 		cur = con.cursor()
