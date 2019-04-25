@@ -3,6 +3,7 @@ from werkzeug import generate_password_hash, check_password_hash
 import sqlite3
 import requests
 import json
+import numpy as np
 
 app = Flask(__name__)
 app.secret_key = "TTP-FS"
@@ -132,8 +133,16 @@ def portfolio():
 	with sqlite3.connect("database.db") as con:
 		cur = con.cursor()
 		cash = "%.2f" % cur.execute("select balance from users where id=?", (session["id"], )).fetchone()[0]
+		portfolio = cur.execute("select ticker_symbol, quantity from portfolio where id=?", (session["id"], ))
+		rows = portfolio.fetchall()
+		current_prices = []
+		#compile the current prices of owned ticker symbol, pass it to portfolio.html
+		for row in rows:
+			url = iex_api_base + row[0] + iex_api_current_price
+			current_prices.append(json.loads(requests.get(url).text))
+		total_worth = "%.2f" % np.sum(current_prices)
 	con.close()
-	return render_template("portfolio.html", cash=cash)
+	return render_template("portfolio.html", cash=cash, rows=rows, current_prices=current_prices, total_worth=total_worth)
 
 @app.route("/transactions/")
 def transactions():
@@ -142,7 +151,7 @@ def transactions():
 
 	with sqlite3.connect("database.db") as con:
 		cur = con.cursor()
-		transactions = cur.execute("select * from transactions where id=?", (session["id"], ))
+		transactions = cur.execute("select type, ticker_symbol, quantity, price from transactions where id=?", (session["id"], ))
 		rows = transactions.fetchall()
 	con.close()
 	return render_template("transactions.html", rows=rows)

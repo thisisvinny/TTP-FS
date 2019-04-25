@@ -4,7 +4,7 @@
 <section class="hero is-primary">
 	<div class="hero-body">
 		<div class="container">
-			<h1 class="title has-text-black">Portfolio</h1>
+			<h1 class="title has-text-black">Portfolio (${{ total_worth }})</h1>
 		</div>
 	</div>
 </section>
@@ -13,21 +13,13 @@
 	<div class="columns">
 
 		<div class="column is-5 is-offset-1">
+			{% for i in range(rows|length) %}
 			<section class="section">
 				<div class="container">
-					<h1 class="title has-text-black">Portfolio</h1>
+					<h1 class="subtitle is-4 has-text-black">{{ rows[i][0] }} - {{ rows[i][1] }} shares	&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Current worth: ${{ current_prices[i] }}</h1>
 				</div>
 			</section>
-			<section class="section">
-				<div class="container">
-					<h1 class="title has-text-black">Portfolio</h1>
-				</div>
-			</section>
-			<section class="section">
-				<div class="container">
-					<h1 class="title has-text-black">Portfolio</h1>
-				</div>
-			</section>
+			{% endfor %}
 		</div>
 
 		<div class="column is-5">

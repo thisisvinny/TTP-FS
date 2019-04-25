@@ -15,7 +15,7 @@
 			{% for i in range(rows|length) %}
 			<div class="field">
 				<div class="container">
-					<h1 class="subtitle has-text-black">{{ rows[i][1] }} ({{ rows[i][2] }}) - {{ rows[i][3] }} shares @ ${{ rows[i][4] }} each</h1>
+					<h1 class="subtitle has-text-black">{{ rows[i][0] }} ({{ rows[i][1] }}) - {{ rows[i][2] }} shares @ ${{ rows[i][3] }} each</h1>
 				</div>
 			</div>
 			{% endfor %}
