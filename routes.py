@@ -1,9 +1,15 @@
 from flask import Flask, render_template, request, session, url_for, redirect, flash
 from werkzeug import generate_password_hash, check_password_hash
 import sqlite3
+import requests
+import json
 
 app = Flask(__name__)
 app.secret_key = "TTP-FS"
+
+iex_api_base = "https://api.iextrading.com/1.0/stock/"
+iex_api_open_price = "/ohlc"
+iex_api_current_price = "/price"
 
 @app.route("/")
 def home():
@@ -77,6 +83,13 @@ def logout():
 		session.pop("email", None)
 	return redirect(url_for("home"))
 
+
+#https://api.iextrading.com/1.0/stock/aapl/price
+#https://api.iextrading.com/1.0/stock/aapl/ohlc
+iex_api_base = "https://api.iextrading.com/1.0/stock/"
+iex_api_open_price = "/ohlc"
+iex_api_current_price = "/price"
+
 @app.route("/portfolio/", methods=["GET", "POST"])
 def portfolio():
 	if "email" not in session:
@@ -84,6 +97,30 @@ def portfolio():
 
 	#Post method, buy stocks
 	if request.method == "POST":
+		#check symbol is valid
+		ticker_symbol = request.form["ticker_symbol"]
+		url = iex_api_base + ticker_symbol + iex_api_current_price
+		response = requests.get(url)
+		if response.status_code == 404:
+			flash("Invalid Ticker Symbol.")
+			return redirect(url_for("portfolio"))
+
+		#check user has enough cash to buy the quantity specified
+		price = json.loads(response.text)
+		quantity = float(request.form["quantity"])
+		with sqlite3.connect("database.db") as con:
+			cur = con.cursor()
+			balance = cur.execute("select balance from users where id=?", (session["id"], )).fetchone()[0]
+			spending = quantity*price
+			#insufficient balance
+			if balance < spending:
+				flash("Insufficient balance.")
+				return redirect(url_for("portfolio"))
+			#otherwise, complete the transaction, update user transactions and portfolios
+			cur.execute("update users set balance=? where id=?", (balance-spending, session["id"]))
+			cur.execute("insert into transactions (id, type, ticker_symbol, quantity, price) values (?,'Buy',?,?,?)", (session["id"], ticker_symbol, quantity, price))
+			cur.execute("insert into portfolio (id, ticker_symbol, quantity, price) values (?,?,?,?)", (session["id"], ticker_symbol, quantity, price))
+		con.close()
 		return redirect(url_for("portfolio"))
 	#Get method, display page with the user's stock portfolio and cash
 	with sqlite3.connect("database.db") as con:
