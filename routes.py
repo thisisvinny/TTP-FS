@@ -3,7 +3,6 @@ from werkzeug import generate_password_hash, check_password_hash
 import sqlite3
 import requests
 import json
-import numpy as np
 
 app = Flask(__name__)
 app.secret_key = "TTP-FS"
@@ -14,7 +13,7 @@ iex_api_current_price = "/price"
 
 @app.route("/")
 def home():
-	return render_template("base.html")
+	return render_template("index.html")
 
 @app.route("/register/", methods=["GET", "POST"])
 def register():

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if not session["email"] %}
+	<section class="hero is-primary is-medium">
+		<div class="hero-body">
+			<div class="container">
+				<h1 class="title has-text-black has-text-centered">Manage Your Stocks</h1>
+			</div>
+			<br><br>
+			<div class="container has-text-centered">
+				<a class="button is-white is-outlined is-inverted is-rounded is-medium" href="{{ url_for('register') }}">Register Now</a>
+			</div>
+		</div>
+	</section>
+{% else %}
+	<section class="hero is-primary is-medium">
+		<div class="hero-body">
+			<div class="container">
+				<h1 class="title has-text-black has-text-centered">Welcome back {{ session["name"] }}!</h1>
+			</div>
+		</div>
+	</section>
+{% endif %}
+
+{% endblock %}
