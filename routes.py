@@ -105,16 +105,22 @@ def portfolio():
 			flash("Invalid Ticker Symbol.")
 			return redirect(url_for("portfolio"))
 
+		#check quantity is non empty
+		try:
+			quantity = float(request.form["quantity"])
+		except:
+			flash("Enter a valid quantity.")
+			return redirect(url_for("portfolio"))
+
 		#check user has enough cash to buy the quantity specified
 		price = json.loads(response.text)
-		quantity = float(request.form["quantity"])
 		with sqlite3.connect("database.db") as con:
 			cur = con.cursor()
 			balance = cur.execute("select balance from users where id=?", (session["id"], )).fetchone()[0]
 			spending = quantity*price
 			#insufficient balance
 			if balance < spending:
-				flash("Insufficient balance.")
+				flash("Insufficient balance. Attempted to spend $%.2f."%(spending))
 				return redirect(url_for("portfolio"))
 			#otherwise, complete the transaction, update user transactions and portfolios
 			cur.execute("update users set balance=? where id=?", (balance-spending, session["id"]))
