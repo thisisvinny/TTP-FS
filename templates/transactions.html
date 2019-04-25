@@ -12,21 +12,13 @@
 <section class="section">
 	<div class="columns">
 		<div class="column is-half is-offset-1">
-			<section class="section">
+			{% for i in range(rows|length) %}
+			<div class="field">
 				<div class="container">
-					<h1 class="title has-text-black">Transaction</h1>
+					<h1 class="subtitle has-text-black">{{ rows[i][1] }} ({{ rows[i][2] }}) - {{ rows[i][3] }} shares @ ${{ rows[i][4] }} each</h1>
 				</div>
-			</section>
-			<section class="section">
-				<div class="container">
-					<h1 class="title has-text-black">Transaction</h1>
-				</div>
-			</section>
-			<section class="section">
-				<div class="container">
-					<h1 class="title has-text-black">Transaction</h1>
-				</div>
-			</section>
+			</div>
+			{% endfor %}
 		</div>
 	</div>
 </section>

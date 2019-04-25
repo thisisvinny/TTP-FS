@@ -139,4 +139,10 @@ def portfolio():
 def transactions():
 	if "email" not in session:
 		return redirect(url_for("home"))
-	return render_template("transactions.html")
+
+	with sqlite3.connect("database.db") as con:
+		cur = con.cursor()
+		transactions = cur.execute("select * from transactions where id=?", (session["id"], ))
+		rows = transactions.fetchall()
+	con.close()
+	return render_template("transactions.html", rows=rows)
