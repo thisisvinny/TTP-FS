@@ -144,14 +144,26 @@ def portfolio():
 		rows = portfolio.fetchall()
 		current_prices = []
 		total_worth = 0
+		performance = []
 		#compile the current prices of owned ticker symbol, pass it to portfolio.html
 		for row in rows:
+			#get current price
 			url = iex_api_base + row[0] + iex_api_current_price
 			current_price = json.loads(requests.get(url).text)
 			current_prices.append(current_price)
 			total_worth += row[1] * current_price
+			#get open price, compare with current price to assign font color
+			url = iex_api_base + row[0] + iex_api_open_price
+			content = json.loads(requests.get(url).text)
+			open_price = content["open"]["price"]
+			if current_price > open_price:
+				performance.append(1)
+			elif current_price < open_price:
+				performance.append(-1)
+			else:
+				performance.append(0)
 	con.close()
-	return render_template("portfolio.html", cash=cash, rows=rows, current_prices=current_prices, total_worth="%.2f"%total_worth)
+	return render_template("portfolio.html", cash=cash, rows=rows, current_prices=current_prices, total_worth="%.2f"%total_worth, performance=performance)
 
 @app.route("/transactions/")
 def transactions():
