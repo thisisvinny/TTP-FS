@@ -126,9 +126,22 @@ def portfolio():
 			#otherwise, complete the transaction, update user transactions and portfolios
 			cur.execute("update users set balance=? where id=?", (balance-spending, session["id"]))
 			cur.execute("insert into transactions (id, type, ticker_symbol, quantity, price) values (?,'Buy',?,?,?)", (session["id"], ticker_symbol, quantity, price))
-			cur.execute("insert into portfolio (id, ticker_symbol, quantity, price) values (?,?,?,?)", (session["id"], ticker_symbol, quantity, price))
+			#if portfolio already has stocks with that ticker_symbol, just increase the quantity
+			try: 
+				old_quantity = cur.execute("select quantity from portfolio where id=? and ticker_symbol=?", (session["id"], ticker_symbol)).fetchone()[0]
+				cur.execute("update portfolio set quantity=? where id=? and ticker_symbol=?", (old_quantity+quantity, session["id"], ticker_symbol))
+			#else insert new stock
+			except:
+				cur.execute("insert into portfolio (id, ticker_symbol, quantity) values (?,?,?)", (session["id"], ticker_symbol, quantity))
+			'''if old_quantity:
+				cur.execute("update portfolio set quantity=? where id=? and ticker_symbol=?", (old_quantity+quantity, session["id"], ticker_symbol))
+			#else insert new stock 
+			else:
+				cur.execute("insert into portfolio (id, ticker_symbol, quantity) values (?,?,?)", (session["id"], ticker_symbol, quantity))
+				'''
 		con.close()
 		return redirect(url_for("portfolio"))
+		
 	#Get method, display page with the user's stock portfolio and cash
 	with sqlite3.connect("database.db") as con:
 		cur = con.cursor()
@@ -136,13 +149,15 @@ def portfolio():
 		portfolio = cur.execute("select ticker_symbol, quantity from portfolio where id=?", (session["id"], ))
 		rows = portfolio.fetchall()
 		current_prices = []
+		total_worth = 0
 		#compile the current prices of owned ticker symbol, pass it to portfolio.html
 		for row in rows:
 			url = iex_api_base + row[0] + iex_api_current_price
-			current_prices.append(json.loads(requests.get(url).text))
-		total_worth = "%.2f" % np.sum(current_prices)
+			current_price = json.loads(requests.get(url).text)
+			current_prices.append(current_price)
+			total_worth += row[1] * current_price
 	con.close()
-	return render_template("portfolio.html", cash=cash, rows=rows, current_prices=current_prices, total_worth=total_worth)
+	return render_template("portfolio.html", cash=cash, rows=rows, current_prices=current_prices, total_worth="%.2f"%total_worth)
 
 @app.route("/transactions/")
 def transactions():
